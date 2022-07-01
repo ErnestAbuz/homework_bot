@@ -43,7 +43,7 @@ CONFIG_VARS = ('PRACTICUM_TOKEN', 'TELEGRAM_TOKEN', 'TELEGRAM_CHAT_ID')
 
 
 def send_message(bot, message):
-    """Отправка сообщения в Telegram"""
+    """Отправка сообщения в Telegram."""
     try:
         logger.info('Сообщение отправлено')
         return bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
@@ -52,7 +52,7 @@ def send_message(bot, message):
 
 
 def get_api_answer(current_timestamp):
-    """Запрос к API сервиса"""
+    """Запрос к API сервиса."""
     timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
     try:
@@ -79,7 +79,7 @@ def get_api_answer(current_timestamp):
 
 
 def check_response(response):
-    """Проверка ответа API"""
+    """Проверка ответа API."""
     if not isinstance(response, dict):
         logger.error('Неверный тип данных')
         raise TypeError('Неверный тип данных')
@@ -96,6 +96,7 @@ def check_response(response):
 
 
 def parse_status(homework):
+    """Статус домашней работы."""
     homework_name = homework['homework_name']
     homework_status = homework['status']
     if 'homework_name' not in homework:
@@ -109,6 +110,7 @@ def parse_status(homework):
 
 
 def check_tokens():
+    """Проверка ответа на корректность."""
     for name in CONFIG_VARS:
         token = globals()[name]
         if not token:
