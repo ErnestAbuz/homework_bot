@@ -26,6 +26,8 @@ HOMEWORK_STATUSES = {
     'rejected': 'Работа проверена: у ревьюера есть замечания.'
 }
 
+logger = logging.getLogger(__name__)
+
 CONFIG_VARS = ('PRACTICUM_TOKEN', 'TELEGRAM_TOKEN', 'TELEGRAM_CHAT_ID')
 
 
@@ -97,7 +99,8 @@ def parse_status(homework):
 def check_tokens():
     """Проверка ответа на корректность."""
     for name in CONFIG_VARS:
-        if not name:
+        token = globals()[name]
+        if not token:
             logger.critical(f'Отсутствует токен: {name}')
             return False
     return True
@@ -135,7 +138,6 @@ def main():
 
 
 if __name__ == '__main__':
-    logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
     handler = logging.StreamHandler()
     logger.addHandler(handler)
