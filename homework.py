@@ -28,8 +28,6 @@ HOMEWORK_STATUSES = {
 
 logger = logging.getLogger(__name__)
 
-CONFIG_VARS = ('PRACTICUM_TOKEN', 'TELEGRAM_TOKEN', 'TELEGRAM_CHAT_ID')
-
 
 def send_message(bot, message):
     """Отправка сообщения в Telegram."""
@@ -69,25 +67,29 @@ def check_response(response):
     """Проверка ответа API."""
     if not isinstance(response, dict):
         raise TypeError('Неверный тип данных')
-    elif response is None:
-        raise Exception('Ответ отсутствует')
+    homeworks = response['homeworks']
+    if homeworks is None:
+        raise ('Нет информации о homeworks')
+    elif not isinstance(homeworks, list):
+        raise TypeError('Неверный тип данных')
+    elif len(homeworks) == 0:
+        raise IndexError('Отсутствует ключ homeworks')
     else:
-        homeworks = response['homeworks']
-        if homeworks is None:
-            raise ('Нет информации о homeworks')
-        elif not isinstance(homeworks, list):
-            raise TypeError('Неверный тип данных')
-        elif len(homeworks) == 0:
-            message = 'Отсутствует ключ homeworks'
-            raise IndexError(message)
-        else:
-            return homeworks
+        return homeworks
 
 
 def parse_status(homework):
     """Статус домашней работы."""
+    homework_name = homework.get('homework_name')
+    homework_status = homework.get('status')
+    if not homework_name or not homework_status:
+        raise KeyError(
+            'Словарь с информацией не имеет ожидаемого ключа'
+        )
     if 'homework_name' not in homework:
         raise KeyError('Работы с таким именем не обнаружено')
+    if 'status' not in homework:
+        raise KeyError('Работы с таким статусом не обнаружено')
     if homework['status'] not in HOMEWORK_STATUSES:
         raise KeyError('Непредвиденный статус работы')
     homework_name = homework['homework_name']
@@ -96,19 +98,14 @@ def parse_status(homework):
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
 
-def check_tokens():
-    """Проверка ответа на корректность."""
-    for name in CONFIG_VARS:
-        token = globals()[name]
-        if not token:
-            logger.critical(f'Отсутствует токен: {name}')
-            return False
-    return True
+def check_tokens() -> None:
+    """Проверка наличия токенов при запуске."""
+    return all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID])
 
 
 def main():
     """Основная логика работы бота."""
-    if not check_tokens():
+    if check_tokens() is False:
         logger.info('Принудительная остановка работы бота')
         sys.exit()
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
