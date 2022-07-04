@@ -86,14 +86,6 @@ def parse_status(homework):
         raise KeyError(
             'Словарь с информацией не имеет ожидаемого ключа'
         )
-    if 'homework_name' not in homework:
-        raise KeyError('Работы с таким именем не обнаружено')
-    if 'status' not in homework:
-        raise KeyError('Работы с таким статусом не обнаружено')
-    if homework['status'] not in HOMEWORK_STATUSES:
-        raise KeyError('Непредвиденный статус работы')
-    homework_name = homework['homework_name']
-    homework_status = homework['status']
     verdict = HOMEWORK_STATUSES[homework_status]
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
